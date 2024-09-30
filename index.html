@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa del Supermercado</title>
+  <!-- Incluimos los estilos de Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 700px;  /* Altura del mapa */
+      width: 100%;     /* Ancho del mapa */
+      margin: 0;
+      padding: 0;
+      background-color: white; /* Asegúrate de que el fondo sea blanco */
+    }
+    body {
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ubicación del Producto en el Supermercado</h1>
+
+  <!-- Input para buscar el producto -->
+  <label for="product">Buscar producto:</label>
+  <input type="text" id="product" placeholder="Escribe el nombre del producto">
+  <button onclick="buscarProducto()">Buscar</button>
+  <button onclick="borrarMarcadores()">Borrar Marcadores</button> <!-- Nuevo botón para borrar marcadores -->
+
+  <!-- Div donde irá el mapa -->
+  <div id="map"></div>
+
+  <!-- Incluimos el script de Leaflet -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Definimos los límites del área que cubre la imagen (ajusta según tu imagen)
+    var bounds = [[0, 0], [670, 459]];
+    
+    // Inicializamos el mapa y configuramos niveles de zoom
+    var map = L.map('map', {
+      crs: L.CRS.Simple,  // Sistema de coordenadas simple para imágenes
+      maxZoom: 1,         // Zoom máximo permitido
+      minZoom: 0,         // Zoom mínimo permitido
+      zoomControl: false,  // Mostrar controles de zoom
+      maxBounds: bounds,  // Limitar la vista a los límites de la imagen
+      maxBoundsViscosity: 1.0  // Evita que el mapa se pueda desplazar fuera de los límites
+    });
+
+    // Cargar la imagen del plano del supermercado
+    var image = L.imageOverlay('planol.jpg', bounds).addTo(map);
+
+    // Ajustar el mapa para que se ajuste a los límites de la imagen
+    map.fitBounds(bounds);
+
+    // Variable para almacenar los marcadores
+    var markers = [];
+
+    // Esta función simula la búsqueda de un producto y la colocación de un marcador
+    function buscarProducto() {
+      const producto = document.getElementById('product').value;
+
+      // Aquí deberías obtener las coordenadas del producto desde el backend (simulamos con coordenadas ficticias)
+      let coordenadas;
+      if (producto.toLowerCase() === 'leche') {
+        coordenadas = [500, 300];  // Coordenadas ficticias dentro del área de la imagen
+      } else if (producto.toLowerCase() === 'pan') {
+        coordenadas = [300, 400];  // Otra ubicación ficticia
+      } else {
+        alert('Producto no encontrado.');
+        return;
+      }
+
+      // Limpiar cualquier marcador anterior (opcional)
+      //map.eachLayer(function (layer) {
+      //  if (layer instanceof L.Marker) {
+      //    map.removeLayer(layer);
+      //  }
+      //});
+
+      // Agregar un marcador en las coordenadas encontradas
+      var marker = L.marker(coordenadas).addTo(map);
+      marker.bindPopup(`<b>${producto}</b> está aquí.`).openPopup();
+      
+      // Almacenar el marcador en el array
+      markers.push(marker);
+
+      // Centrar el mapa en las coordenadas del producto
+      map.setView(coordenadas, 1); // Ajustar el nivel de zoom a un valor adecuado
+    }
+
+    // Función para borrar todos los marcadores
+    function borrarMarcadores() {
+      // Iterar sobre el array de marcadores y eliminarlos del mapa
+      markers.forEach(function(marker) {
+        map.removeLayer(marker);
+      });
+      // Limpiar el array de marcadores
+      markers = [];
+    }
+  </script>
+</body>
+</html>
